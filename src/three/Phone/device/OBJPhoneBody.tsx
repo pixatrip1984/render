@@ -1,94 +1,124 @@
-import { useMemo } from "react";
+import { useLayoutEffect } from "react";
+import * as THREE from "three";
 import { useLoader } from "@react-three/fiber";
-import { OBJLoader } from "three-stdlib";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { staticFile } from "remotion";
 import type { DeviceModel } from "./DeviceModel";
 import type { PhoneMaterialPreset } from "../phoneConfig";
-import * as THREE from "three";
 
 /**
- * Loads an external OBJ model for the device body.
- * Uses polygonOffset to prevent z-fighting between screen and body surfaces.
+ * The Blender-exported iPhone 17 Pro model (single Grey colorway, extracted to
+ * public/models/iphone17pro.obj and centered on its body).
+ *
+ * Coordinate convention (matches the scene): +Z = FRONT (screen), -Z = BACK
+ * (rear cameras). The model's front face is at +Z and the lens barrels protrude
+ * toward -Z, so no rotation is needed — only a uniform scale.
+ *
+ * The model has no MTL/textures, so materials are assigned here by OBJ usemtl
+ * name. The body object is one multi-material mesh (geometry groups), the lens
+ * barrels/discs are separate meshes.
  */
 
-const staticFile = (path: string) => `/models${path}`;
+// Body height in model units is 4.0411; scale to the same 0.95 scene height as
+// the procedural phone so camera framing and animations are unchanged.
+const MODEL_SCALE = 0.95 / 4.041;
 
-interface OBJPhoneBodyProps {
-  material: PhoneMaterialPreset;
+// Front face of the model glass sits at z ≈ 0.03698 after scaling. The display
+// cutout (usemtl "Display") spans 1.8657 x 3.9139 model units -> 0.4386 x 0.9201
+// scene units, centered on the body. The screen plane fills that cutout edge to
+// edge (modern thin-bezel look); the Dynamic Island pill (y 0.409..0.449 scaled)
+// is replicated inside the wallpaper texture at the matching position.
+const DISPLAY = {
+  width: 0.4386,
+  height: 0.9201,
+  z: 0.037,
+};
+
+const GLASS = {
+  width: 0.4386,
+  height: 0.9201,
+  thickness: 0.0008,
+  radius: 0.06,
+  z: 0.0386,
+};
+
+interface MaterialConfig {
+  color: string;
+  metalness: number;
+  roughness: number;
+  clearcoat?: number;
 }
 
-function OBJPhoneBody({ material }: OBJPhoneBodyProps) {
-  const obj = useLoader(OBJLoader, staticFile("/iphone17pro.obj"));
+const MATERIALS: Record<string, MaterialConfig> = {
+  "Matte_Metallic_Grey": { color: "#70757b", metalness: 1.0, roughness: 0.38, clearcoat: 0.4 },
+  "Matte_Metallic_Grey_logo.001": { color: "#70757b", metalness: 1.0, roughness: 0.3, clearcoat: 0.4 },
+  "Cam_1": { color: "#06070c", metalness: 0.1, roughness: 0.05, clearcoat: 1.0 },
+  "Cam_2": { color: "#05060b", metalness: 0.1, roughness: 0.05, clearcoat: 1.0 },
+  "Cam_3": { color: "#06070c", metalness: 0.1, roughness: 0.05, clearcoat: 1.0 },
+  "LIDAR_Senser": { color: "#0d0f15", metalness: 0.7, roughness: 0.15 },
+  "Torch": { color: "#f6f2e4", metalness: 0.0, roughness: 0.35 },
+  "Mic": { color: "#16181d", metalness: 0.4, roughness: 0.6 },
+  "Display": { color: "#05060b", metalness: 0.3, roughness: 0.12, clearcoat: 1.0 },
+  "Display_Borders": { color: "#0a0b0e", metalness: 0.2, roughness: 0.35 },
+  "Dynamic_Iceland": { color: "#0a0b0e", metalness: 0.2, roughness: 0.3 },
+  "Side_Dark_Lines.004": { color: "#2b2e34", metalness: 0.9, roughness: 0.35 },
+  "Warnex_Black": { color: "#1c1e23", metalness: 0.7, roughness: 0.4 },
+  "Metal_Mesh_Grill": { color: "#34373d", metalness: 0.9, roughness: 0.55 },
+};
 
-  // Clone and configure materials to prevent z-fighting
-  useMemo(() => {
-    obj.traverse((child: THREE.Object3D) => {
-      if (child instanceof THREE.Mesh) {
-        const mesh = child as THREE.Mesh;
-        
-        // Apply phone material to body parts
-        if (mesh.material instanceof THREE.Material) {
-          const mat = mesh.material as THREE.MeshPhysicalMaterial | THREE.MeshStandardMaterial;
-          
-          // Detect screen/display objects and apply polygon offset
-          const isScreen = mesh.name.toLowerCase().includes("screen") || 
-                          mesh.name.toLowerCase().includes("display") ||
-                          mesh.name.toLowerCase().includes("pantalla");
-          
-          // Detect camera lens objects
-          const isCameraLens = mesh.name.toLowerCase().includes("lens") ||
-                              mesh.name.toLowerCase().includes("camera") ||
-                              mesh.name.toLowerCase().includes("camara");
-          
-          // Detect flash/sensor objects
-          const isFlash = mesh.name.toLowerCase().includes("flash") ||
-                         mesh.name.toLowerCase().includes("led") ||
-                         mesh.name.toLowerCase().includes("sensor");
+function OBJPhoneBody({ material: _material }: { material: PhoneMaterialPreset }) {
+  // Suspends until the 5 MB OBJ is fetched + parsed (Remotion waits via the
+  // ThreeCanvas Suspense boundary, the preview wraps the scene in <Suspense>).
+  const obj = useLoader(OBJLoader, staticFile("models/iphone17pro.obj")) as THREE.Group;
 
-          if (isScreen) {
-            // Screen needs to be slightly in front with polygon offset
-            mesh.renderOrder = 1;
-            mat.polygonOffset = true;
-            mat.polygonOffsetFactor = -2; // Pull forward
-            mat.polygonOffsetUnits = -2;
-          } else if (isCameraLens || isFlash) {
-            // Camera lenses and flash should render after body
-            mesh.renderOrder = 2;
-            mat.polygonOffset = true;
-            mat.polygonOffsetFactor = -1;
-            mat.polygonOffsetUnits = -1;
-          } else {
-            // Body material
-            mat.color = new THREE.Color(material.color);
-            mat.metalness = material.metalness;
-            mat.roughness = material.roughness;
-            
-            if (mat instanceof THREE.MeshPhysicalMaterial) {
-              mat.clearcoat = 0.5;
-              mat.clearcoatRoughness = 0.2;
-            }
-          }
-          
-          mat.needsUpdate = true;
-        }
-      }
+  useLayoutEffect(() => {
+    obj.traverse((child) => {
+      if (!(child instanceof THREE.Mesh) || child.userData.iphone17Mat) return;
+
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      const next = mats.map((m) => {
+        const cfg = m ? MATERIALS[m.name] : undefined;
+        if (!cfg) return m;
+        const mat = new THREE.MeshPhysicalMaterial({
+          color: cfg.color,
+          metalness: cfg.metalness,
+          roughness: cfg.roughness,
+          envMapIntensity: 1.05,
+          ...(cfg.clearcoat !== undefined
+            ? { clearcoat: cfg.clearcoat, clearcoatRoughness: 0.15 }
+            : {}),
+        });
+        mat.name = m.name;
+        return mat;
+      });
+
+      if (next.length === 1) child.material = next[0];
+      else child.material = next;
+
+      child.userData.iphone17Mat = true;
+      child.castShadow = true;
     });
-  }, [obj, material]);
+  }, [obj]);
 
-  return <primitive object={obj} />;
+  return (
+    <group scale={MODEL_SCALE}>
+      <primitive object={obj} />
+    </group>
+  );
 }
 
 export const objPhoneModel: DeviceModel = {
   id: "iphone-17-pro",
   display: {
-    width: 0.412,
-    height: 0.915,
-    position: [0, 0, 0.0374], // Adjusted to prevent z-fighting with body (~0.03698)
+    width: DISPLAY.width,
+    height: DISPLAY.height,
+    position: [0, 0, DISPLAY.z],
     glass: {
-      width: 0.432,
-      height: 0.946,
-      thickness: 0.0015,
-      position: [0, 0, 0.0385], // Glass slightly in front of screen
-      radius: 0.046,
+      width: GLASS.width,
+      height: GLASS.height,
+      thickness: GLASS.thickness,
+      position: [0, 0, GLASS.z],
+      radius: GLASS.radius,
     },
   },
   Body: OBJPhoneBody,
