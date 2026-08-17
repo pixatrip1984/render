@@ -1,5 +1,4 @@
 import React, { Component, Suspense, useMemo, useRef, useState } from "react";
-import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { defaultScene } from "../config/defaultScene";
@@ -82,12 +81,6 @@ export const Preview: React.FC = () => {
                 />
               </Suspense>
             </SceneErrorBoundary>
-            <OrbitControls
-              makeDefault
-              target={config.camera.target}
-              enableDamping
-              dampingFactor={0.08}
-            />
             <MotionController
               deviceRef={deviceRef}
               store={store}
@@ -95,6 +88,7 @@ export const Preview: React.FC = () => {
                 position: config.device.position,
                 rotation: config.device.rotation,
               }}
+              cameraTarget={config.camera.target}
             />
           </Canvas>
         </div>

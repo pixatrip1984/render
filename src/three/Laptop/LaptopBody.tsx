@@ -30,6 +30,15 @@ const TARGET_WIDTH = 1.2;
 /** The backdrop plane baked into the export; hide it. */
 const BACKDROP_MATERIAL = "Material.001";
 
+/**
+ * Interior parts that must NOT cast the ground shadow. The keyboard well, keys,
+ * trackpad and recessed deck pieces sit inside the chassis and poke out at the
+ * light's grazing angle, so they project a "keyboard skeleton" ghost shadow
+ * (outline + key shapes) offset from the laptop. Only the outer shell (Main,
+ * Second, lid details) should cast the silhouette.
+ */
+const NO_SHADOW_CAST = new Set(["Black", "KeysMain", "KeysBottom", "DarkGrey", "TopLine"]);
+
 interface MaterialConfig {
   color: string;
   metalness: number;
@@ -91,6 +100,8 @@ function LaptopBody({ screenSrc }: { screenSrc: string }) {
       if (!(child instanceof THREE.Mesh) || child.userData.macbookMat) return;
 
       const mats = Array.isArray(child.material) ? child.material : [child.material];
+      const castName = mats[0]?.name ?? "";
+      child.castShadow = !NO_SHADOW_CAST.has(castName);
       const next = mats.map((m) => {
         const name = m?.name ?? "";
         if (name === BACKDROP_MATERIAL) {
@@ -128,7 +139,6 @@ function LaptopBody({ screenSrc }: { screenSrc: string }) {
       else child.material = next;
 
       child.userData.macbookMat = true;
-      child.castShadow = true;
       child.receiveShadow = true;
     });
   }, [obj, screenTexture]);
