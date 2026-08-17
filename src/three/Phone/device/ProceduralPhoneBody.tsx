@@ -64,44 +64,43 @@ const LENS_MATERIAL = {
 // iPhone 16 Pro camera island: large square bump in top-left corner
 // Based on CAD design from reference image
 const CAMERA_ISLAND = {
-  size: 0.235,          // Large square base (~54% of phone width)
-  depth: 0.007,         // Camera bump protrusion from back panel
-  radius: 0.018,        // Rounded corners on the island
-  x: -0.135,            // Positioned in top-left corner with margin
-  y: 0.365,
-  z: -0.0135,           // Base sits on rear panel surface
+  size: 0.21,           // Large square base (~48% of phone width)
+  depth: 0.006,         // Camera bump protrusion from back panel
+  radius: 0.015,        // Rounded corners on the island
+  x: -0.115,            // Positioned in top-left corner with proper margin
+  y: 0.34,              // Vertical position from center
+  z: -0.0125,           // Base sits on rear panel surface
 };
 
 const LENS_RING = {
-  radius: 0.036,        // Larger lens rings for iPhone 16 Pro
-  tube: 0.006,          // Thicker metallic ring
-  z: 0.009,             // Lens rings sit ON TOP of island base
+  radius: 0.032,        // Lens rings for iPhone 16 Pro
+  tube: 0.005,          // Metallic ring thickness
+  z: 0.008,             // Lens rings sit ON TOP of island base
 };
 
 const LENS_GLASS = {
-  radius: 0.028,        // Larger lens glass diameter
-  z: 0.0115,            // Outermost rear-facing surface
+  radius: 0.024,        // Lens glass diameter
+  z: 0.0105,            // Outermost rear-facing surface
 };
 
-// iPhone 16 Pro lens positions: equilateral triangle pattern
-// Top lens centered horizontally on the island
-// Two bottom lenses symmetrically placed
+// iPhone 16 Pro lens positions: triangular pattern
+// Top lens centered, two bottom lenses forming the base of triangle
 const LENS_POSITIONS = [
-  [0.0, 0.062],       // Top-center lens (aligned with island center)
-  [-0.058, -0.038],   // Bottom-left lens
-  [0.058, -0.038],    // Bottom-right lens
+  [0.0, 0.055],       // Top-center lens
+  [-0.052, -0.032],   // Bottom-left lens
+  [0.052, -0.032],    // Bottom-right lens
 ];
 
 const FLASH = {
-  radius: 0.014,
-  position: [-0.072, 0.058],  // Flash to the left of top lens
-  z: 0.007,
+  radius: 0.012,
+  position: [-0.065, 0.052],  // Flash to the left of top lens
+  z: 0.006,
 };
 
 const LIDAR = {
-  radius: 0.007,
-  position: [0.072, -0.058],  // LiDAR sensor at bottom-right
-  z: 0.006,
+  radius: 0.006,
+  position: [0.065, -0.052],  // LiDAR sensor at bottom-right
+  z: 0.005,
 };
 
 function SideButtons() {
