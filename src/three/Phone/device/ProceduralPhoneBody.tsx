@@ -168,12 +168,12 @@ function RearCameraModule() {
       {LENS_POSITIONS.map(([dx, dy], i) => (
         <group key={i} position={[CAMERA_ISLAND.x + dx, CAMERA_ISLAND.y + dy, 0]}>
           {/* lens ring - metallic housing that holds the lens glass, sits ON TOP of island */}
-          <mesh position={[0, 0, CAMERA_ISLAND.z + LENS_RING.z]}>
+          <mesh position={[0, 0, CAMERA_ISLAND.z + LENS_RING.z]} rotation={[Math.PI, 0, 0]}>
             <torusGeometry args={[LENS_RING.radius, LENS_RING.tube, 24, 48]} />
             <meshPhysicalMaterial {...LENS_MATERIAL} clearcoat={1} clearcoatRoughness={0.1} />
           </mesh>
           {/* lens glass - dark circular surface facing BACK (-Z), sits slightly beyond the ring */}
-          <mesh position={[0, 0, CAMERA_ISLAND.z + LENS_GLASS.z]}>
+          <mesh position={[0, 0, CAMERA_ISLAND.z + LENS_GLASS.z]} rotation={[Math.PI, 0, 0]}>
             <circleGeometry args={[LENS_GLASS.radius, 32]} />
             <meshPhysicalMaterial
               color="#05060a"
@@ -189,6 +189,7 @@ function RearCameraModule() {
       {/* flash / sensor array, positioned on the island surface to the left of top lens */}
       <mesh
         position={[CAMERA_ISLAND.x + FLASH.position[0], CAMERA_ISLAND.y + FLASH.position[1], CAMERA_ISLAND.z + FLASH.z]}
+        rotation={[Math.PI, 0, 0]}
       >
         <circleGeometry args={[FLASH.radius, 24]} />
         <meshPhysicalMaterial
@@ -203,6 +204,7 @@ function RearCameraModule() {
       {/* LiDAR sensor dot - small black circle typical of iPhone Pro models, at bottom-right area */}
       <mesh
         position={[CAMERA_ISLAND.x + LIDAR.position[0], CAMERA_ISLAND.y + LIDAR.position[1], CAMERA_ISLAND.z + LIDAR.z]}
+        rotation={[Math.PI, 0, 0]}
       >
         <circleGeometry args={[LIDAR.radius, 16]} />
         <meshPhysicalMaterial
