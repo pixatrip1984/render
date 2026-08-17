@@ -15,7 +15,7 @@ export const defaultScene: SceneConfig = {
     scale: 1,
   },
   screen: {
-    src: "/screens/iphone-cream.png",
+    src: "/screens/astra-1.png",
     fit: "cover",
     brightness: 1,
   },

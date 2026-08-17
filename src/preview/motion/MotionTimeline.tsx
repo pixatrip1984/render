@@ -56,9 +56,12 @@ export function MotionTimeline({ store }: { store: MotionStore }) {
     if (kfs.length <= MAX_KEYFRAME_DOTS) {
       return kfs.map((k) => k.time / d);
     }
-    const step = kfs.length / MAX_KEYFRAME_DOTS;
+    // Downsample to at most MAX_KEYFRAME_DOTS dots. Use an integer stride so
+    // `kfs[i]` always indexes a real keyframe (a fractional stride would read
+    // `kfs[1.005] === undefined` and crash once the recording exceeds 200).
+    const stride = Math.max(1, Math.ceil(kfs.length / MAX_KEYFRAME_DOTS));
     const out: number[] = [];
-    for (let i = 0; i < kfs.length; i += step) {
+    for (let i = 0; i < kfs.length; i += stride) {
       out.push(kfs[i].time / d);
     }
     return out;

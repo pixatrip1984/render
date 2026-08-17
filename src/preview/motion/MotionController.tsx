@@ -97,7 +97,7 @@ export function MotionController({ deviceRef, store, initialPose }: MotionContro
     }
   }, [mode]);
 
-  if (!device || mode === "play") return null;
+  if (!device || mode !== "record") return null;
 
   return <TransformControls object={device} mode={gizmo} />;
 }
