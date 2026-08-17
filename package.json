@@ -1,0 +1,34 @@
+{
+  "name": "product-motion-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Independent 3D motion-graphics lab: a premium, manipulable smartphone with a replaceable screenshot, rendered deterministically via Remotion.",
+  "scripts": {
+    "dev": "vite",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "remotion:studio": "remotion studio",
+    "remotion:compositions": "remotion compositions",
+    "render:still": "remotion still PhoneStill output/phone-still.png",
+    "render:orbit": "remotion render PhoneOrbit output/phone-orbit.mp4"
+  },
+  "dependencies": {
+    "@react-three/drei": "10.7.8",
+    "@react-three/fiber": "9.7.0",
+    "@remotion/three": "4.0.512",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.512",
+    "three": "0.185.1"
+  },
+  "devDependencies": {
+    "@remotion/cli": "4.0.512",
+    "@types/react": "~19.2.18",
+    "@types/react-dom": "~19.2.4",
+    "@types/three": "~0.185.4",
+    "@vitejs/plugin-react": "6.0.5",
+    "typescript": "~5.9.3",
+    "vite": "8.2.1"
+  }
+}
