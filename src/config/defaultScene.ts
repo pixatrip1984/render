@@ -8,7 +8,7 @@ import type { SceneConfig } from "../types/scene";
 export const defaultScene: SceneConfig = {
   device: {
     type: "phone",
-    model: "procedural-phone",
+    model: "iphone-17-pro",
     color: "champagne",
     position: [0, 0, 0],
     rotation: [0, -0.35, 0],
