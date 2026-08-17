@@ -28,3 +28,31 @@ export function roundedRectShape(
   shape.quadraticCurveTo(x, y, x + r, y);
   return shape;
 }
+
+/**
+ * A flat, texture-ready rounded-rectangle geometry.
+ *
+ * THREE.ShapeGeometry emits UVs equal to the shape's local coordinates (centered
+ * on the origin), not the [0,1] range a texture expects. This remaps them to
+ * [0,1] across the shape's bounding box so a screen texture maps edge-to-edge.
+ */
+export function roundedRectGeometry(
+  width: number,
+  height: number,
+  radius: number,
+): THREE.ShapeGeometry {
+  const shape = roundedRectShape(width, height, radius);
+  const geometry = new THREE.ShapeGeometry(shape, 8);
+
+  const position = geometry.getAttribute("position") as THREE.BufferAttribute;
+  const uv = geometry.getAttribute("uv") as THREE.BufferAttribute;
+
+  for (let i = 0; i < position.count; i++) {
+    const u = (position.getX(i) + width / 2) / width;
+    const v = (position.getY(i) + height / 2) / height;
+    uv.setXY(i, u, v);
+  }
+  uv.needsUpdate = true;
+
+  return geometry;
+}

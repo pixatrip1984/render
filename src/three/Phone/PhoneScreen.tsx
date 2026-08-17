@@ -3,7 +3,7 @@ import * as THREE from "three";
 import type { ScreenConfig } from "../../types/scene";
 import type { DisplaySurface } from "./device/DeviceModel";
 import { useScreenTexture } from "./useScreenTexture";
-import { roundedRectShape } from "./geometry";
+import { roundedRectGeometry, roundedRectShape } from "./geometry";
 
 interface PhoneScreenProps {
   display: DisplaySurface;
@@ -64,22 +64,56 @@ export function PhoneScreen({ display, screen }: PhoneScreenProps) {
 
   const glass = display.glass;
 
+  const contentGeometry = useMemo(
+    () => roundedRectGeometry(display.width, display.height, display.cornerRadius),
+    [display.width, display.height, display.cornerRadius],
+  );
+
   const glassShape = useMemo(
     () => roundedRectShape(glass.width, glass.height, glass.radius),
     [glass.width, glass.height, glass.radius],
   );
 
+  const sensor = display.sensor;
+  const islandShape = useMemo(
+    () =>
+      sensor
+        ? roundedRectShape(sensor.width, sensor.height, sensor.height / 2)
+        : null,
+    [sensor],
+  );
+
   return (
     <group>
-      {/* ScreenContent — emissive, lighting-independent */}
-      <mesh position={display.position}>
-        <planeGeometry args={[display.width, display.height]} />
+      {/* ScreenContent — emissive, lighting-independent, rounded to the display cutout */}
+      <mesh position={display.position} geometry={contentGeometry}>
         <meshBasicMaterial
           map={texture}
           color={brightness}
           toneMapped={false}
         />
       </mesh>
+
+      {/* Front sensor cluster — Dynamic Island pill + camera lens, proud of the screen */}
+      {sensor && islandShape && (
+        <group position={sensor.position}>
+          <mesh>
+            <shapeGeometry args={[islandShape]} />
+            <meshBasicMaterial color="#0a0b0e" />
+          </mesh>
+          <mesh position={[sensor.lens.x, sensor.lens.y, 0.0006]}>
+            <circleGeometry args={[sensor.lens.radius, 32]} />
+            <meshPhysicalMaterial
+              color="#16202f"
+              roughness={0.08}
+              metalness={0.7}
+              clearcoat={1}
+              clearcoatRoughness={0.1}
+              envMapIntensity={1.2}
+            />
+          </mesh>
+        </group>
+      )}
 
       {/* ScreenGlass — subtle transparent reflection, flat front with rounded perimeter */}
       <mesh

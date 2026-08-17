@@ -45,6 +45,7 @@ const GLASS = {
 const DISPLAY = {
   width: 0.412,
   height: 0.915,
+  cornerRadius: 0.04,
   z: 0.0105, // screen plane, just in front of the bezel
 };
 
@@ -273,6 +274,7 @@ export const proceduralPhoneModel: DeviceModel = {
   display: {
     width: DISPLAY.width,
     height: DISPLAY.height,
+    cornerRadius: DISPLAY.cornerRadius,
     position: [0, 0, DISPLAY.z],
     glass: {
       width: GLASS.width,

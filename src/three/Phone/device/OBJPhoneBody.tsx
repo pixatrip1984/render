@@ -25,21 +25,33 @@ const MODEL_SCALE = 0.95 / 4.041;
 
 // Front face of the model glass sits at z ≈ 0.03698 after scaling. The display
 // cutout (usemtl "Display") spans 1.8657 x 3.9139 model units -> 0.4386 x 0.9201
-// scene units, centered on the body. The screen plane fills that cutout edge to
-// edge (modern thin-bezel look); the Dynamic Island pill (y 0.409..0.449 scaled)
-// is replicated inside the wallpaper texture at the matching position.
+// scene units, centered on the body, with a corner radius of 0.30 model units
+// -> 0.0705 scene units. The screen plane fills that cutout edge to edge with the
+// same rounded corners so the metal frame stays visible as a thin bezel.
 const DISPLAY = {
   width: 0.4386,
   height: 0.9201,
-  z: 0.037,
+  cornerRadius: 0.0705,
+  z: 0.0372,
 };
 
 const GLASS = {
   width: 0.4386,
   height: 0.9201,
   thickness: 0.0008,
-  radius: 0.06,
+  radius: 0.0705,
   z: 0.0386,
+};
+
+// Front-facing sensor cluster (Dynamic Island). The OBJ "Dynamic_Iceland" group
+// is a flat pill at the same z as the screen surface, so it z-fights/hides behind
+// the screen plane. We render our own island + front camera lens just in front of
+// the screen so the sensor reads as a physical element sitting on top.
+const FRONT_SENSOR = {
+  width: 0.1412,
+  height: 0.0402,
+  position: [-0.0042, 0.4292, 0.0377] as [number, number, number],
+  lens: { x: 0.04, y: 0, radius: 0.012 },
 };
 
 interface MaterialConfig {
@@ -112,6 +124,7 @@ export const objPhoneModel: DeviceModel = {
   display: {
     width: DISPLAY.width,
     height: DISPLAY.height,
+    cornerRadius: DISPLAY.cornerRadius,
     position: [0, 0, DISPLAY.z],
     glass: {
       width: GLASS.width,
@@ -120,6 +133,7 @@ export const objPhoneModel: DeviceModel = {
       position: [0, 0, GLASS.z],
       radius: GLASS.radius,
     },
+    sensor: FRONT_SENSOR,
   },
   Body: OBJPhoneBody,
 };
