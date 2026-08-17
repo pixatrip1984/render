@@ -3,6 +3,7 @@ import { RoundedBox } from "@react-three/drei";
 import type { DeviceModel } from "./DeviceModel";
 import type { PhoneMaterialPreset } from "../phoneConfig";
 import { roundedRectShape } from "../geometry";
+import { objPhoneModel } from "./OBJPhoneBody";
 
 /**
  * Physical dimensions of the procedural phone (world units).
@@ -286,4 +287,5 @@ export const proceduralPhoneModel: DeviceModel = {
 
 export const DEVICE_MODELS: Record<string, DeviceModel> = {
   [proceduralPhoneModel.id]: proceduralPhoneModel,
+  [objPhoneModel.id]: objPhoneModel,
 };
