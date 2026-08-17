@@ -33,3 +33,24 @@ export const defaultScene: SceneConfig = {
     color: "#eee9e2",
   },
 };
+
+/**
+ * Laptop preset — same studio framing, but the device is the MacBook OBJ with
+ * its own wallpaper. Used by the preview's device switcher.
+ */
+export const laptopScene: SceneConfig = {
+  ...defaultScene,
+  device: {
+    type: "laptop",
+    model: "macbook-pro",
+    color: "graphite",
+    position: [0, 0, 0],
+    rotation: [0, -0.35, 0],
+    scale: 1,
+  },
+  screen: {
+    src: "/screens/macbook-wallpaper.png",
+    fit: "cover",
+    brightness: 1,
+  },
+};
