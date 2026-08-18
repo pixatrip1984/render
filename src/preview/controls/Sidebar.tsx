@@ -1,6 +1,7 @@
 import React from "react";
+import { defaultScene, laptopScene } from "../../config/defaultScene";
 import { PHONE_COLOR_IDS, PHONE_MATERIAL_PRESETS } from "../../three/Phone/phoneConfig";
-import type { SceneConfig, Vec3 } from "../../types/scene";
+import type { DeviceType, SceneConfig, Vec3 } from "../../types/scene";
 
 interface SidebarProps {
   config: SceneConfig;
@@ -106,6 +107,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ config, onChange }) => {
     config.device.rotation[2] / DEG,
   ];
 
+  const switchDeviceType = (type: DeviceType) => {
+    if (type === config.device.type) return;
+    onChange(type === "laptop" ? laptopScene : defaultScene);
+  };
+
   return (
     <aside
       style={{
@@ -118,7 +124,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ config, onChange }) => {
       }}
     >
       <div style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600 }}>
-        3D Phone Preview
+        3D Device Preview
+      </div>
+
+      <div style={sectionStyle}>
+        <div style={labelStyle}>Device</div>
+        <label style={rowStyle}>
+          <span style={{ width: 70, color: "#a6a8b3", fontSize: 12 }}>Type</span>
+          <select
+            style={{ ...inputStyle, width: 130 }}
+            value={config.device.type}
+            onChange={(e) => switchDeviceType(e.target.value as DeviceType)}
+          >
+            <option value="phone">Phone</option>
+            <option value="laptop">Laptop</option>
+          </select>
+        </label>
       </div>
 
       <div style={sectionStyle}>
@@ -156,20 +177,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ config, onChange }) => {
 
       <div style={sectionStyle}>
         <div style={labelStyle}>Appearance</div>
-        <label style={rowStyle}>
-          <span style={{ width: 70, color: "#a6a8b3", fontSize: 12 }}>Color</span>
-          <select
-            style={{ ...inputStyle, width: 130 }}
-            value={config.device.color}
-            onChange={(e) => updateDevice({ color: e.target.value as SceneConfig["device"]["color"] })}
-          >
-            {PHONE_COLOR_IDS.map((id) => (
-              <option key={id} value={id}>
-                {PHONE_MATERIAL_PRESETS[id].label}
-              </option>
-            ))}
-          </select>
-        </label>
+        {config.device.type === "phone" && (
+          <label style={rowStyle}>
+            <span style={{ width: 70, color: "#a6a8b3", fontSize: 12 }}>Color</span>
+            <select
+              style={{ ...inputStyle, width: 130 }}
+              value={config.device.color}
+              onChange={(e) => updateDevice({ color: e.target.value as SceneConfig["device"]["color"] })}
+            >
+              {PHONE_COLOR_IDS.map((id) => (
+                <option key={id} value={id}>
+                  {PHONE_MATERIAL_PRESETS[id].label}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label style={rowStyle}>
           <span style={{ width: 70, color: "#a6a8b3", fontSize: 12 }}>Background</span>
           <input

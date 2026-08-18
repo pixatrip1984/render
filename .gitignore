@@ -1,7 +1,74 @@
-node_modules/
+```
+# Build artifacts
 dist/
-output/
-.vite/
+build/
+*.obj
+
+# Dependencies
+node_modules/
+
+# Editors
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Logs and temp files
 *.log
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Compiled files
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.exe
+*.out
+
+# Archives
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.gz
+*.rar
+*.7z
+
+# OS generated files
 .DS_Store
 Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Testing
+.pytest_cache/
+.mypy_cache/
+.nyc_output/
+coverage/
+
+# Distribution / packaging
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage*
+.cache
+nosetests.xml
+```

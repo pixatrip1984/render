@@ -6,9 +6,11 @@ export type ScreenFit = "cover" | "contain";
 
 export type LightingPreset = "studio-soft";
 
+export type DeviceType = "phone" | "laptop";
+
 export interface DeviceConfig {
-  type: "phone";
-  /** Device model id resolved through the DEVICE_MODELS registry. */
+  type: DeviceType;
+  /** Device model id resolved through the DEVICE_MODELS registry (phone) or laptop body (laptop). */
   model: string;
   /** Key into PHONE_MATERIAL_PRESETS. Changing it must never affect the screen. */
   color: PhoneColorPreset;
